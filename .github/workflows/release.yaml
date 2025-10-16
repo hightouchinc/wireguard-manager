@@ -25,11 +25,19 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Update version in code
+        run: |
+          sed -i 's/version = \["SNAPSHOT"\]/version = ["${{ github.ref_name }}"]/g' src/main/kotlin/com/hightouchinc/WireguardManagerCommand.kt
+
       - name: Run tests
         run: ./gradlew test
+        env:
+          VERSION: ${{ github.ref_name }}
 
       - name: Build Shadow JAR
         run: ./gradlew shadowjar
+        env:
+          VERSION: ${{ github.ref_name }}
 
       - name: Release
         uses: softprops/action-gh-release@v2
