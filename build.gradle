@@ -7,7 +7,13 @@ plugins {
     id("com.gradleup.shadow") version "8.3.7"
 }
 
-version = "0.0.2"
+version = !System.getenv("VERSION") ? {
+    try {
+        return "git describe --tags --always".execute().text.trim()
+    } catch (Exception ignored) {
+        return "SNAPSHOT"
+    }
+}() : System.getenv("VERSION")
 group = "com.hightouchinc"
 
 repositories {
@@ -63,6 +69,19 @@ micronaut {
         incremental(true)
         annotations("com.hightouchinc.*")
     }
+}
+
+tasks.register('generateVersionProperties') {
+    def propsFile = file("${buildDir}/resources/main/version.properties")
+    outputs.file(propsFile)
+    doLast {
+        propsFile.parentFile.mkdirs()
+        propsFile.text = "version=${project.version}\n"
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn('generateVersionProperties')
 }
 
 tasks.named("dockerfileNative") {

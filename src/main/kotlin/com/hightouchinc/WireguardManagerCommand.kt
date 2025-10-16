@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import picocli.CommandLine
 
 @CommandLine.Command(
-   version = ["0.0.3"],
+   version = ["SNAPSHOT"],
    name = "wireguard-manager",
    description = ["CLI tool to manage a wireguard server and generate client configurations"],
    mixinStandardHelpOptions = true,
