@@ -24,6 +24,12 @@ import picocli.CommandLine
 )
 class WireguardManagerCommand : Callable<Int>, CommandLine.IExitCodeGenerator {
 
+   @CommandLine.Option(
+      names = ["--verbose", "-v"],
+      description = ["Enable verbose logging output"],
+   )
+   var verbose: Boolean = false
+
    @CommandLine.Spec
    lateinit var spec: CommandLine.Model.CommandSpec
 
@@ -43,6 +49,16 @@ class WireguardManagerCommand : Callable<Int>, CommandLine.IExitCodeGenerator {
 
       @JvmStatic
       fun main(args: Array<String>) {
+         // Configure slf4j-simple logging level before any logger is created
+         // Check if --verbose or -v flag is present in arguments
+         val isVerbose = args.any { it == "--verbose" || it == "-v" }
+         
+         if (isVerbose) {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug")
+         } else {
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "warn")
+         }
+
          val logger = LoggerFactory.getLogger(WireguardManagerCommand::class.java)
 
          val exitCode = try {
