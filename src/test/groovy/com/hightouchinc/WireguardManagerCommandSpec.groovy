@@ -24,9 +24,10 @@ class WireguardManagerCommandSpec extends Specification {
         PicocliRunner.call(WireguardManagerCommand, ctx, args)
 
         expect:
-        baos.toString() == '''Usage: wireguard-manager [-hV] [COMMAND]
+        baos.toString() == '''Usage: wireguard-manager [-hvV] [COMMAND]
 CLI tool to manage a wireguard server and generate client configurations
   -h, --help      Show this help message and exit.
+  -v, --verbose   Enable verbose logging output.
   -V, --version   Print version information and exit.
 Commands:
   initialize, init  Initialize server

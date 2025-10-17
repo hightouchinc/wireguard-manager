@@ -26,7 +26,7 @@ class WireguardManagerCommand : Callable<Int>, CommandLine.IExitCodeGenerator {
 
    @CommandLine.Option(
       names = ["--verbose", "-v"],
-      description = ["Enable verbose logging output"],
+      description = ["Enable verbose logging output."],
    )
    var verbose: Boolean = false
 

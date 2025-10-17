@@ -5,6 +5,7 @@ plugins {
     id("groovy")
     id("io.micronaut.application") version "4.5.4"
     id("com.gradleup.shadow") version "8.3.7"
+    id("jacoco")
 }
 
 version = !System.getenv("VERSION") ? {
@@ -63,5 +64,32 @@ micronaut {
     processing {
         incremental(true)
         annotations("com.hightouchinc.*")
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.test {
+    finalizedBy tasks.jacocoTestReport
+}
+
+tasks.jacocoTestReport {
+    dependsOn tasks.test
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+tasks.jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0
+            }
+        }
     }
 }
