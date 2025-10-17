@@ -38,19 +38,18 @@ PostUp = nft add table inet wireguard
 PostUp = nft add chain inet wireguard forward_wg { type filter hook forward priority 0\\; policy accept\\; }
 PostUp = nft add chain inet wireguard postrouting_wg { type nat hook postrouting priority srcnat\\; policy accept\\; }
 
-# Allow forwarding for WireGuard interface
-PostUp = nft add rule inet wireguard forward_wg iifname "%i" accept
-PostUp = nft add rule inet wireguard forward_wg oifname "%i" accept
+# Allow established and related connections
+PostUp = nft add rule inet wireguard forward_wg ct state established,related accept
 
-# Enable NAT masquerading for outbound traffic
-PostUp = nft add rule inet wireguard postrouting_wg oifname "ens5" masquerade
+# Allow forwarding between WireGuard and ens5 in both directions
+PostUp = nft add rule inet wireguard forward_wg iifname "%i" oifname "ens5" accept
+PostUp = nft add rule inet wireguard forward_wg iifname "ens5" oifname "%i" accept
 
-# Add route to 10.0.0.0/8 network via WireGuard interface
-PostUp = ip route add 10.0.0.0/8 via 192.168.10.1 dev %i
+# Enable NAT masquerading for outbound traffic from WireGuard
+PostUp = nft add rule inet wireguard postrouting_wg oifname "ens5" ip saddr 192.168.10.0/24 masquerade
 
 # Cleanup when bringing down the interface
 PostDown = nft delete table inet wireguard 2>/dev/null || true
-PostDown = ip route del 10.0.0.0/8 via 192.168.10.1 dev %i 2>/dev/null || true
 
 # Client configurations
 
@@ -95,24 +94,24 @@ PostUp = nft add table inet wireguard
 PostUp = nft add chain inet wireguard forward_wg { type filter hook forward priority 0\\; policy accept\\; }
 PostUp = nft add chain inet wireguard postrouting_wg { type nat hook postrouting priority srcnat\\; policy accept\\; }
 
-# Allow forwarding for WireGuard interface
-PostUp = nft add rule inet wireguard forward_wg iifname "%i" accept
-PostUp = nft add rule inet wireguard forward_wg oifname "%i" accept
+# Allow established and related connections
+PostUp = nft add rule inet wireguard forward_wg ct state established,related accept
 
-# Enable NAT masquerading for outbound traffic
-PostUp = nft add rule inet wireguard postrouting_wg oifname "ens5" masquerade
+# Allow forwarding between WireGuard and ens5 in both directions
+PostUp = nft add rule inet wireguard forward_wg iifname "%i" oifname "ens5" accept
+PostUp = nft add rule inet wireguard forward_wg iifname "ens5" oifname "%i" accept
 
-# Add route to 10.0.0.0/8 network via WireGuard interface
-PostUp = ip route add 10.0.0.0/8 via 192.168.10.1 dev %i
+# Enable NAT masquerading for outbound traffic from WireGuard
+PostUp = nft add rule inet wireguard postrouting_wg oifname "ens5" ip saddr 192.168.10.0/24 masquerade
 
 # Cleanup when bringing down the interface
 PostDown = nft delete table inet wireguard 2>/dev/null || true
-PostDown = ip route del 10.0.0.0/8 via 192.168.10.1 dev %i 2>/dev/null || true
 
 # Client configurations
 
 [Peer]
 # Client ID: e4abc0b8-9415-11f0-b1a9-a8a1594fece3
+# Client Name: peer1
 PublicKey = FpYYbcVzDO0iImR8aeIqzO86qJNWvsorzqmWRNbX3A4=
 PresharedKey = AuOkyITV+fY0aaCuLN4UWKtWHxzVL8fyqvwvY8VnirI=
 AllowedIPs = 192.168.10.2/32

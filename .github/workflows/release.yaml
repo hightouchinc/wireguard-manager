@@ -21,21 +21,25 @@ jobs:
         with:
           java-version: '21'
           distribution: 'corretto'
+          cache: 'gradle'
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+          gradle-home-cache-cleanup: true
 
       - name: Update version in code
         run: |
           sed -i 's/version = \["SNAPSHOT"\]/version = ["${{ github.ref_name }}"]/g' src/main/kotlin/com/hightouchinc/WireguardManagerCommand.kt
 
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --build-cache --parallel
         env:
           VERSION: ${{ github.ref_name }}
 
       - name: Build Shadow JAR
-        run: ./gradlew shadowjar
+        run: ./gradlew shadowjar --build-cache
         env:
           VERSION: ${{ github.ref_name }}
 
